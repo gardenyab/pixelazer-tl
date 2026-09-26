@@ -2,7 +2,7 @@ MIT License
 
 Copyright (c) 2016-Present LonamiWebs
 Copyright (c) 2026 - 2030 Codrago
-Copyright (c) 2026 radiocycle — astralix-tl modifications
+Copyright (c) 2026 LowSense — astralix-tl modifications
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
