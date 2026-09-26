@@ -1,3 +1,6 @@
+MIT License
+
+Copyright (c) 2016-Present LonamiWebs
 Copyright (c) 2026 - 2030 Codrago
 Copyright (c) 2026 radiocycle — astralix-tl modifications
 

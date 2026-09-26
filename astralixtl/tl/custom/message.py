@@ -70,7 +70,7 @@ class Message(ChatGetter, SenderGetter, TLObject):
 
         invert_media (`bool`):
             Whether the media in this message should be inverted.
-            
+
         offline (`bool`):
             Whether the message was sent by an implicit action, for example, as an away or a greeting business message, or as a scheduled message.
 
