@@ -9,7 +9,7 @@ description = "This library is built for the Pixelazer Userbot and is based on T
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
 requires-python = ">=3.10"
-maintainers = [{ name = "lowsense-dev" }]
+maintainers = [{ name = "gardenyab" }]
 authors = [
     { name = "GardenYab", email = "gardenyab@eblanka.com" },
 ]

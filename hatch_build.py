@@ -24,7 +24,7 @@ BuildHookInterface: Any = _BuildHookInterface
 
 # Needed since we're importing local files
 GENERATOR_DIR = Path("telethon_generator")
-LIBRARY_DIR = Path("astralixtl")
+LIBRARY_DIR = Path("pixelazertl")
 
 ERRORS_IN = GENERATOR_DIR / "data/errors.csv"
 ERRORS_OUT = LIBRARY_DIR / "errors/rpcerrorlist.py"

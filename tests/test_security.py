@@ -10,18 +10,18 @@ import tempfile
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astralixtl._security import MAX_PACKET_SIZE
-from astralixtl._web import PublicResolver, validate_url, download
-from astralixtl.client.uploads import _is_session_file, _session_content_detected, _is_sensitive_name
-from astralixtl.errors import SecurityError
-from astralixtl.extensions import BinaryReader
-from astralixtl.network.connection.tcpfull import FullPacketCodec
-from astralixtl.network.connection.tcpabridged import AbridgedPacketCodec
-from astralixtl.network.connection.tcpintermediate import IntermediatePacketCodec
-from astralixtl.network.authenticator import do_authentication
-from astralixtl.sessions import SQLiteSession
-from astralixtl.tl.core.gzippacked import GzipPacked
-from astralixtl.tl.core import MessageContainer, RpcResult
+from pixelazertl._security import MAX_PACKET_SIZE
+from pixelazertl._web import PublicResolver, validate_url, download
+from pixelazertl.client.uploads import _is_session_file, _session_content_detected, _is_sensitive_name
+from pixelazertl.errors import SecurityError
+from pixelazertl.extensions import BinaryReader
+from pixelazertl.network.connection.tcpfull import FullPacketCodec
+from pixelazertl.network.connection.tcpabridged import AbridgedPacketCodec
+from pixelazertl.network.connection.tcpintermediate import IntermediatePacketCodec
+from pixelazertl.network.authenticator import do_authentication
+from pixelazertl.sessions import SQLiteSession
+from pixelazertl.tl.core.gzippacked import GzipPacked
+from pixelazertl.tl.core import MessageContainer, RpcResult
 
 
 class SecurityTests(unittest.IsolatedAsyncioTestCase):
@@ -48,7 +48,7 @@ class SecurityTests(unittest.IsolatedAsyncioTestCase):
     def test_container_compressed_messages_share_an_expansion_limit(self):
         for body in (bytes(GzipPacked(b'x' * 1024)), struct.pack('<Iq', RpcResult.CONSTRUCTOR_ID, 1) + bytes(GzipPacked(b'x' * 1024))):
             message = struct.pack('<qii', 1, 1, len(body)) + body
-            with patch('astralixtl.tl.core.messagecontainer.MAX_UNCOMPRESSED_SIZE', 2048):
+            with patch('pixelazertl.tl.core.messagecontainer.MAX_UNCOMPRESSED_SIZE', 2048):
                 self.assertEqual(len(MessageContainer.from_reader(BinaryReader(struct.pack('<i', 2) + message * 2)).messages), 2)
                 with self.assertRaises(BufferError):
                     MessageContainer.from_reader(BinaryReader(struct.pack('<i', 3) + message * 3))
@@ -56,7 +56,7 @@ class SecurityTests(unittest.IsolatedAsyncioTestCase):
     def test_gzip_round_trip_and_limit(self):
         data = b'hello' * 20
         self.assertEqual(GzipPacked._decompress(gzip.compress(data)), data)
-        with patch('astralixtl.tl.core.gzippacked.MAX_UNCOMPRESSED_SIZE', 32):
+        with patch('pixelazertl.tl.core.gzippacked.MAX_UNCOMPRESSED_SIZE', 32):
             with self.assertRaises(ValueError):
                 GzipPacked._decompress(gzip.compress(b'x' * 33))
             self.assertEqual(GzipPacked._decompress(gzip.compress(b'x' * 32)), b'x' * 32)
@@ -136,9 +136,9 @@ class EncryptedMessageTests(unittest.TestCase):
         import time
         from collections import defaultdict
         from hashlib import sha256
-        from astralixtl.crypto import AES, AuthKey
-        from astralixtl.network.mtprotostate import MTProtoState
-        from astralixtl.tl.types import Pong
+        from pixelazertl.crypto import AES, AuthKey
+        from pixelazertl.network.mtprotostate import MTProtoState
+        from pixelazertl.tl.types import Pong
         key = AuthKey(os.urandom(256))
         state = MTProtoState(key, loggers=defaultdict(lambda: logging.getLogger('test')))
         obj = bytes(Pong(msg_id=1, ping_id=42))
