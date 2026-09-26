@@ -3,15 +3,15 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "astralix-tl"
+name = "pixelazer-tl"
 dynamic = ["version"]
-description = "This library is built for the astralix Userbot and is based on Telethon."
+description = "This library is built for the Pixelazer Userbot and is based on Telethon."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
 requires-python = ">=3.10"
 maintainers = [{ name = "lowsense-dev" }]
 authors = [
-    { name = "Codrago", email = "codrago@xyecoc.com" },
+    { name = "GardenYab", email = "gardenyab@eblanka.com" },
 ]
 keywords = [
     "api",
@@ -40,17 +40,17 @@ cryptg = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lowsense-dev/astralix-tl"
-Source = "https://github.com/lowsense-dev/astralix-tl"
+Homepage = "https://github.com/gardenyab/pixelazer-tl"
+Source = "https://github.com/gardenyab/pixelazer-tl"
 Documentation = "https://docs.telethon.dev"
 Reference = "https://tl.telethon.dev"
 
 [tool.hatch.version]
-path = "astralixtl/version.py"
+path = "pixelazertl/version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/astralixtl",
+    "/pixelazertl",
     "/telethon_generator",
     "/hatch_build.py",
     "/README.md",
@@ -62,4 +62,4 @@ include = [
 [tool.hatch.build.hooks.custom]
 
 [tool.hatch.build.targets.wheel]
-packages = ["astralixtl"]
+packages = ["pixelazertl"]

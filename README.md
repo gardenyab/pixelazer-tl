@@ -1,8 +1,8 @@
-# astralix-tl
+# pixelazer-tl
 
-Telegram MTProto client library for **astralix Userbot**, based on HerokuTL and Telethon.
+Telegram MTProto client library for **Pixelazer Userbot**, based on AstralixTL and Telethon.
 
-Repository: https://github.com/lowsense-dev/astralix-tl (private). No project Telegram channels or chats.
+Repository: https://github.com/gardentab/pixelazer-tl. No project Telegram channels or chats.
 
 ## Install from source
 
@@ -11,10 +11,10 @@ uv venv .venv
 uv pip install --python .venv/bin/python .
 ```
 
-The distribution is named `astralix-tl`; Python imports use `astralixtl`:
+The distribution is named `pixelazer-tl`; Python imports use `pixelazertl`:
 
 ```python
-from astralixtl import TelegramClient
+from pixelazer import TelegramClient
 ```
 
 The build generates Telegram types from the included schemas. Build a wheel with `uv build --wheel`.
@@ -33,4 +33,4 @@ uv pip install --python .venv/bin/python aiohttp
 
 ## License and origins
 
-MIT; see [LICENSE.md](LICENSE.md). Copyright notices for the upstream code and astralix modifications are retained. See [NOTICE.md](NOTICE.md).
+MIT; see [LICENSE.md](LICENSE.md). Copyright notices for the upstream code and pixelazer modifications are retained. See [NOTICE.md](NOTICE.md).
