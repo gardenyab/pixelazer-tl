@@ -1,5 +1,8 @@
 from .tlmessage import TLMessage
 from ..tlobject import TLObject
+from ..._security import MAX_UNCOMPRESSED_SIZE
+from .gzippacked import GzipPacked
+from .rpcresult import RpcResult
 
 
 class MessageContainer(TLObject):
@@ -35,14 +38,37 @@ class MessageContainer(TLObject):
 
     @classmethod
     def from_reader(cls, reader):
-        # This assumes that .read_* calls are done in the order they appear
+        from ...extensions import BinaryReader
+
+        count = reader.read_int()
+        # Each inner message has a 16-byte header and at least a constructor.
+        if not 0 <= count <= min(1024, (len(reader.get_bytes()) - reader.tell_position()) // 20):
+            raise BufferError("Invalid MTProto container count")
         messages = []
-        for _ in range(reader.read_int()):
+        expanded_size = 0
+        for _ in range(count):
             msg_id = reader.read_long()
             seq_no = reader.read_int()
             length = reader.read_int()
-            before = reader.tell_position()
-            obj = reader.tgread_object()  # May over-read e.g. RpcResult
-            reader.set_position(before + length)
+            remaining = len(reader.get_bytes()) - reader.tell_position()
+            if length < 4 or length % 4 or length > remaining:
+                raise BufferError("Invalid MTProto inner message length")
+            # RPC results consume the remainder of their reader. Isolate each
+            # body so they cannot copy or parse subsequent messages as payload.
+            with BinaryReader(reader.read(length)) as inner:
+                if inner.read_int(signed=False) == cls.CONSTRUCTOR_ID:
+                    raise BufferError("Nested MTProto containers are not allowed")
+                inner.seek(-4)
+                obj = inner.tgread_object()
+                if inner.tell_position() != length:
+                    raise BufferError("MTProto inner message length mismatch")
+            expanded = (
+                len(obj.data) if isinstance(obj, GzipPacked)
+                else len(obj.body or b"") if isinstance(obj, RpcResult)
+                else length
+            )
+            expanded_size += max(length, expanded)
+            if expanded_size > MAX_UNCOMPRESSED_SIZE:
+                raise BufferError("Expanded MTProto container exceeds size limit")
             messages.append(TLMessage(msg_id, seq_no, obj))
         return MessageContainer(messages)

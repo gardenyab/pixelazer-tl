@@ -21,9 +21,38 @@ from astralixtl.network.connection.tcpintermediate import IntermediatePacketCode
 from astralixtl.network.authenticator import do_authentication
 from astralixtl.sessions import SQLiteSession
 from astralixtl.tl.core.gzippacked import GzipPacked
+from astralixtl.tl.core import MessageContainer, RpcResult
 
 
 class SecurityTests(unittest.IsolatedAsyncioTestCase):
+    def test_container_rpc_bodies_do_not_include_following_messages(self):
+        body = struct.pack('<IqI', RpcResult.CONSTRUCTOR_ID, 1, 0x997275b5)
+        message = struct.pack('<qii', 1, 1, len(body)) + body
+        result = MessageContainer.from_reader(BinaryReader(struct.pack('<i', 2) + message * 2))
+        self.assertEqual([m.obj.body for m in result.messages], [body[-4:]] * 2)
+
+    def test_container_rejects_invalid_counts_lengths_and_nesting(self):
+        payload = struct.pack('<I', 0x997275b5)
+        message = struct.pack('<qii', 1, 1, 4) + payload
+        for count in (-1, 1025):
+            with self.subTest(count=count), self.assertRaises(BufferError):
+                MessageContainer.from_reader(BinaryReader(struct.pack('<i', count) + message * max(count, 0)))
+        for length in (-4, 0, 3, 8):
+            with self.subTest(length=length), self.assertRaises(BufferError):
+                MessageContainer.from_reader(BinaryReader(struct.pack('<iqii', 1, 1, 1, length) + payload))
+        nested = struct.pack('<Ii', MessageContainer.CONSTRUCTOR_ID, 0)
+        with self.assertRaises(BufferError):
+            MessageContainer.from_reader(BinaryReader(struct.pack('<iqii', 1, 1, 1, len(nested)) + nested))
+        self.assertEqual(MessageContainer.from_reader(BinaryReader(struct.pack('<i', 0))).messages, [])
+
+    def test_container_compressed_messages_share_an_expansion_limit(self):
+        for body in (bytes(GzipPacked(b'x' * 1024)), struct.pack('<Iq', RpcResult.CONSTRUCTOR_ID, 1) + bytes(GzipPacked(b'x' * 1024))):
+            message = struct.pack('<qii', 1, 1, len(body)) + body
+            with patch('astralixtl.tl.core.messagecontainer.MAX_UNCOMPRESSED_SIZE', 2048):
+                self.assertEqual(len(MessageContainer.from_reader(BinaryReader(struct.pack('<i', 2) + message * 2)).messages), 2)
+                with self.assertRaises(BufferError):
+                    MessageContainer.from_reader(BinaryReader(struct.pack('<i', 3) + message * 3))
+
     def test_gzip_round_trip_and_limit(self):
         data = b'hello' * 20
         self.assertEqual(GzipPacked._decompress(gzip.compress(data)), data)
